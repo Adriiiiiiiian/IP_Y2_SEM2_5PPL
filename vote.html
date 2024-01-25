@@ -71,6 +71,7 @@
     <!--[if lt IE 9]>
       <script src="js/respond.min.js"></script>
     <![endif]-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
@@ -88,6 +89,7 @@
         messagingSenderId: "858295535851",
         appId: "1:858295535851:web:82e4bd04c20ed4913916ae",
       };
+
       import {
         getDatabase,
         ref,
@@ -110,38 +112,112 @@
       const app = initializeApp(firebaseConfig);
       const db = getDatabase();
       const auth = getAuth();
-      const feedbackRef = ref(db, "feedback");
+      const votesRef = ref(db, "votes");
 
-      function sendFeedback() {
-        const nameInput = document.getElementById("contactNameValue");
-        const emailInput = document.getElementById("contactEmailValue");
-        const messageValue = document.getElementById("inquiryValue");
+      var fuseVote = document
+        .getElementById("fuseVote")
+        .addEventListener("click", sendVoteFuse);
 
-        const fullName = nameInput.value;
-        const email = emailInput.value;
-        const message = messageValue.value;
+      function sendVoteFuse() {
+        get(ref(db, "votes/fuse")).then((snapshot) => {
+          const currentCount = snapshot.val().voteForFuse || 0;
+          const updatedCount = currentCount + 1;
 
-        var question = {
-          name: fullName,
-          email: email,
-          inquiry: message,
-        };
-        console.log(question);
-        push(ref(db, `feedback`), question);
-
-        nameInput.value = "";
-        emailInput.value = "";
-        messageValue.value = "";
-        contactAlert(); // Add parentheses to call the function
+          set(ref(db, "votes/fuse"), { voteForFuse: updatedCount });
+          getDailyActiveUsers();
+        });
       }
 
-      function contactAlert() {
-        alert("Your inquiry has been sent in, thank you.");
+      var quizVote = document
+        .getElementById("quizVote")
+        .addEventListener("click", sendVoteQuiz);
+
+      function sendVoteQuiz() {
+        get(ref(db, "votes/quiz")).then((snapshot) => {
+          const currentCount = snapshot.val().voteForQuiz || 0;
+          const updatedCount = currentCount + 1;
+
+          set(ref(db, "votes/quiz"), { voteForQuiz: updatedCount });
+          getDailyActiveUsers();
+        });
       }
 
-      var contactBtn = document
-        .getElementById("contactBtn")
-        .addEventListener("click", sendFeedback);
+      var mazeVote = document
+        .getElementById("mazeVote")
+        .addEventListener("click", sendVoteMaze);
+
+      function sendVoteMaze() {
+        get(ref(db, "votes/maze")).then((snapshot) => {
+          const currentCount = snapshot.val().voteForMaze || 0;
+          const updatedCount = currentCount + 1;
+
+          set(ref(db, "votes/maze"), { voteForMaze: updatedCount });
+          getDailyActiveUsers();
+        });
+      }
+      var recycleVote = document
+        .getElementById("recycleVote")
+        .addEventListener("click", sendVoteRecycle);
+
+      function sendVoteRecycle() {
+        get(ref(db, "votes/recycle")).then((snapshot) => {
+          const currentCount = snapshot.val().voteForRecycle || 0;
+          const updatedCount = currentCount + 1;
+
+          set(ref(db, "votes/recycle"), { voteForRecycle: updatedCount });
+          getDailyActiveUsers();
+        });
+      }
+      const myChartCanvas = document.getElementById("myPieChart");
+      const myChartContext = myChartCanvas.getContext("2d");
+      const myChart = new Chart(myChartContext, {
+        type: "pie",
+        data: {
+          labels: ["Fusion", "Quiz", "Maze", "Recycle"],
+          datasets: [
+            {
+              label: "# of Votes",
+              data: [0, 0, 0, 0],
+              borderWidth: 1,
+              backgroundColor: ["blue", "green", "purple", "yellow"],
+            },
+          ],
+        },
+      });
+
+      function updateChart(votes, snapshot) {
+        myChart.data.labels = votes; //Updates the labels of the chart with the array from colors
+        myChart.data.datasets[0].data = votes.map((vote) => {
+          const voteKey = `voteFor${
+            vote.charAt(0).toUpperCase() + vote.slice(1) //looks for the key by seperating the front words, making the first letter upper case by slicing
+          }`;
+          return snapshot.val()[vote][voteKey];
+        });
+        myChart.update();
+      }
+      function getDailyActiveUsers() {
+        console.log("getting daily active users");
+
+        get(votesRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            try {
+              let colors = [];
+
+              snapshot.forEach((childSnapshot) => {
+                colors.push(childSnapshot.key);
+              });
+
+              updateChart(colors, snapshot);
+              console.log(colors);
+            } catch (error) {
+              console.log(error);
+            }
+          } else {
+            console.log("snapshot does not exist");
+          }
+        });
+      }
+      getDailyActiveUsers();
     </script>
   </head>
   <body>
@@ -184,11 +260,8 @@
           <div class="container">
             <div class="row">
               <div class="col-md-8 col-md-offset-2 float-overlay">
-                <h2>Contact Us</h2>
-                <h3>
-                  Separated they live in Bookmarksgrove right at the coast of
-                  the Semantics, a large language ocean.
-                </h3>
+                <h2>Vote for your favourite area</h2>
+                <h3>Come and vote for your favourite area in the game</h3>
               </div>
             </div>
           </div>
@@ -196,71 +269,17 @@
       </div>
       <!-- END fh5co-intro-section -->
       <div id="fh5co-contact-section">
-        <div class="container">
-          <div class="col-md-4 animate-box">
-            <h3 class="section-title">Our Address</h3>
-            <p>
-              Far far away, behind the word mountains, far from the countries
-              Vokalia and Consonantia, there live the blind texts.
-            </p>
-            <ul class="contact-info">
-              <li>
-                <i class="icon-location-pin"></i>198 West 21th Street, Suite 721
-                New York NY 10016
-              </li>
-              <li><i class="icon-phone2"></i>+ 1235 2355 98</li>
-              <li>
-                <i class="icon-mail"></i><a href="#">info@yoursite.com</a>
-              </li>
-              <li>
-                <i class="icon-globe2"></i><a href="#">www.yoursite.com</a>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-8 animate-box">
-            <form action="#">
-              <div class="form-group row">
-                <div class="col-md-6 field">
-                  <label for="firstname">Name: </label>
-                  <input
-                    class="form-control"
-                    type="text"
-                    id="contactNameValue"
-                    placeholder="Full Name "
-                  />
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-md-6 field">
-                  <label for="email">Email: </label>
-                  <input
-                    class="form-control"
-                    type="email"
-                    id="contactEmailValue"
-                    placeholder="Email Address"
-                  />
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-md-12 field">
-                  <label for="message">Message: </label>
-                  <input
-                    type="text"
-                    id="inquiryValue"
-                    class="form-control"
-                    placeholder="Message"
-                    class="input_message"
-                    cols="30"
-                    rows="10"
-                  />
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-md-12 field">
-                  <button id="contactBtn" class="btn btn-primary">Send</button>
-                </div>
-              </div>
-            </form>
+       
+          <h1>Vote on what was your favourite interaction!</h1>
+          <canvas id="myPieChart" width="70" height="70"></canvas>
+          <h1> </h1>
+      
+          <!-- Voting buttons -->
+          <button id="fuseVote" class="btn btn-primary">Vote for the fusing game</button>
+          <button id="quizVote" class="btn btn-primary">Vote for the quiz game</button>
+          <button id="mazeVote" class="btn btn-primary">Vote for the maze</button>
+          <button id="recycleVote" class="btn btn-primary">Vote for the recycle section</button>
+ 
           </div>
         </div>
       </div>
