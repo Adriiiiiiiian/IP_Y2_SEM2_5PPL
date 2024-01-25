@@ -166,6 +166,19 @@
         }
       </script>
       </header>
+      <style>
+ 
+        .center {
+      margin: auto;
+      width: 90%;
+     
+      padding: 10px;
+    }
+    .input_message {
+        height: 50px;
+        width: 100%;  
+      }
+      </style>
       <!-- END: header -->
       <div
         id="fh5co-intro-section"
@@ -189,19 +202,24 @@
       </div>
       <!-- END fh5co-intro-section -->
       <div id="fh5co-contact-section">
-       
-        <img src="" id="firebase-img" />
+        <div class="center">
+          <img src="" id="firebase-img" />
 
-        <input type="file" id="photo" /><br />
-    
-        <br />
-        <input
-          type="text"
-          id="file-name-to-save"
-          placeholder="Key in file name to save as, leave blank to use uploaded filename"
-        />
-        <button id="upload" class="btn btn-primary">Upload Image</button><br />
-        <div id="progress-status"></div>
+          <input type="file" id="photo" /><br />
+      
+          <br />
+          <input
+            type="text"
+            id="file-name-to-save"
+            class="input_message"
+            placeholder="Key in file name to save as, leave blank to use uploaded filename"
+          />
+          <h1></h1>
+          <button id="upload" class="btn btn-primary">Upload Image</button><br />
+          <div id="progress-status"></div>
+        </div>
+       
+
  
           </div>
         </div>

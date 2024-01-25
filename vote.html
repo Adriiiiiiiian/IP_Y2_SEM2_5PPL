@@ -220,6 +220,20 @@
       getDailyActiveUsers();
     </script>
   </head>
+  <style>
+ 
+    .center {
+  margin: auto;
+  width: 90%;
+ text-align: center;
+  padding: 10px;
+}
+.input_message {
+    height: 50px;
+    width: 100%;  
+  }
+  </style>
+
   <body>
     <div class="box-wrap">
       <header role="banner" id="fh5co-header">
@@ -269,16 +283,18 @@
       </div>
       <!-- END fh5co-intro-section -->
       <div id="fh5co-contact-section">
-       
-          <h1>Vote on what was your favourite interaction!</h1>
-          <canvas id="myPieChart" width="70" height="70"></canvas>
-          <h1> </h1>
-      
-          <!-- Voting buttons -->
-          <button id="fuseVote" class="btn btn-primary">Vote for the fusing game</button>
-          <button id="quizVote" class="btn btn-primary">Vote for the quiz game</button>
-          <button id="mazeVote" class="btn btn-primary">Vote for the maze</button>
-          <button id="recycleVote" class="btn btn-primary">Vote for the recycle section</button>
+       <div class="center">
+        <h1>Vote on what was your favourite interaction!</h1>
+        <canvas id="myPieChart" width="50" height="50"></canvas>
+        <h1> </h1>
+    
+        <!-- Voting buttons -->
+        <button id="fuseVote" class="btn btn-primary">Vote for the fusing game</button>
+        <button id="quizVote" class="btn btn-primary">Vote for the quiz game</button>
+        <button id="mazeVote" class="btn btn-primary">Vote for the maze</button>
+        <button id="recycleVote" class="btn btn-primary">Vote for the recycle section</button>
+       </div>
+
  
           </div>
         </div>
